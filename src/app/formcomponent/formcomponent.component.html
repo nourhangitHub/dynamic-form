@@ -1,0 +1,185 @@
+<div class="container">
+    <div class="row page-content">
+        <div class="col-md-5 flex-column">
+            <form [formGroup]="jsonForm">
+                <textarea rows="12" cols="80" formControlName="textArea"
+                    placeholder="please Enter Avalid Json Formate"></textarea>
+                <div class="alert alert-danger" *ngIf="jsonError">
+                    you enter an invaled json formate please check that.
+                </div>
+            </form>
+            <br>
+            <form>
+                <div class="d-flex flex-row justify-content-between mb-3">
+                    <h6 class="m-auto"> sample valid json object</h6>
+                    <a (click)="oncopy()" class="btn btn-warning"> copy json</a>
+                </div>
+                <textarea #copy rows="12" cols="80">
+                    {
+                        "title": "dynamic Form",
+                        "fields": [
+                            {
+                                "id": "firstLabel",
+                                "type": "Label",
+                                "label": "First Label"
+                            },
+                            {
+                                "id": "FullName",
+                                "type": "Textbox",
+                                "label": "Full Name",
+                                "inputType":"text",
+                                "value": "",
+                                "placeholder": "enter Full Name",
+                                "Required": true
+                            },
+                            {
+                                "id": "E-mail",
+                                "type": "Textbox",
+                                "label": "email",
+                                "inputType":"email",
+                                "value": "",
+                                "placeholder": "enter your email",
+                                "Required": true
+                            },
+                            {
+                                "id": "Password",
+                                "type": "Textbox",
+                                "label": "Password",
+                                "inputType":"password",
+                                "placeholder": "enter password",
+                                "Required": true
+                            },
+                            {
+                                "id": "availableJobs",
+                                "type": "Dropdown",
+                                "label": "Available Jobs",
+                                "value": "",
+                                "placeholder": "Choose your Job .....",
+                                "Required": true,
+                                "options": [
+                                    "FrontEnd Developer",
+                                    "Backend Developer",
+                                    "Ios Developer",
+                                    "Android Developer"
+                                ]
+                            },
+                            {
+                                "id": "skiels",
+                                "label": "Skiels",
+                                "type": "Checkbox",
+                                "options": [
+                                    {
+                                        "label": "HTML",
+                                        "value": "html",
+                                        "checked": true
+                                    },
+                                    {
+                                        "label": "CSS",
+                                        "value": "css",
+                                        "checked": true
+                                    },
+                                    {
+                                        "label": "JS",
+                                        "value": "js"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "gender",
+                                "label": "gender",
+                                "type": "RadioButton",
+                                "value": "",
+                                "Required": true,
+                                "options": [
+                                    {
+                                        "label": "Male",
+                                        "value": "Male"
+                                    },
+                                    {
+                                        "label": "Female",
+                                        "value": "Female"
+                                    }
+                                ]
+                            },
+                            {
+                                "id": "cancelButton",
+                                "type": "Cancel",
+                                "value": "Cancel"
+                            },
+                            {
+                                "id": "submitButton",
+                                "type": "Submit",
+                                "value": "Submit"
+                            }
+                        ]
+                    }
+                </textarea>
+            </form>
+        </div>
+        <div class="col-md-5 ml-auto" *ngIf="isRendered">
+            <form [formGroup]="dynamicForm">
+                <h4 class="text-center">{{formObject?.title}}</h4>
+                <div *ngFor="let field of formObject.fields">
+                    <div [ngSwitch]="field.type">
+                        <div class="form-group" *ngSwitchCase="'Label'">
+                            <label>{{field?.label}}</label>
+                        </div>
+                        <div class="form-group" *ngSwitchCase="'Textbox'">
+                            <label for="{{field.label}}">{{field?.label}}</label>
+                            <input [type]="field.inputType" class="form-control" id="{{field.label}}" placeholder="{{field?.placeholder}}"
+                                [formControlName]="field.id" value="{{field.value}}">
+                            <div *ngIf="dynamicForm.get(field.id).dirty || dynamicForm.get(field.id).touched">
+                                <div class="alert alert-danger" role="alert" *ngIf="dynamicForm.get(field.id).invalid">
+                                    {{field?.label}} contain invalid value
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" *ngSwitchCase="'Dropdown'">
+                            <label for="{{field.label}}">{{field?.label}}:</label>
+                            <select class="custom-select" [formControlName]="field.id" id="{{field.label}}">
+                                <option value="" selected>{{field?.placeholder}}</option>
+                                <option *ngFor="let option of field.options" [ngValue]="option">{{option}}</option>
+                            </select>
+                            <div *ngIf="dynamicForm.get(field.id).dirty || dynamicForm.get(field.id).touched">
+                                <div class="alert alert-danger" role="alert" *ngIf="dynamicForm.get(field.id).invalid">
+                                    {{field?.label}} contain invalid value
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-check" *ngSwitchCase="'Checkbox'">
+                            <span>{{field?.label}}: </span>
+                            <span class="m-4" [formArrayName]="field.id" *ngFor="let option of dynamicForm.get(field.id).controls; let i = index">
+                                <input class="form-check-input" id="{{checkboxOptions[i].label}}" [formControlName]="i"
+                                value="{{checkboxOptions[i].value}}" type="checkbox">
+                                <label class="form-check-label" for="{{checkboxOptions[i].label}}">{{checkboxOptions[i].label}}</label>
+                            </span>
+                        </div>
+                        <div class="form-check" *ngSwitchCase="'RadioButton'">
+                            <span class="strong">{{field?.label}}: </span>
+                            <span class="m-4" *ngFor="let option of field.options">
+                                <input class="form-check-input" id="{{option.label}}" [formControlName]="field.id"
+                                [value]="option.label"  [name]="field.label" type="radio">
+                                <label class="form-check-label" for="{{option.label}}">{{option.label}}</label>
+                            </span>
+                        </div>
+                        <div *ngSwitchCase="'Submit'">
+                            <button class="btn btn-primary" type="submit">{{field.value}}</button>
+                        </div>
+                        <div *ngSwitchCase="'Cancel'">
+                            <button class="btn btn-danger" type="reset">{{field.value}}</button>
+                        </div>
+                        <div *ngSwitchDefault class="alert alert-danger" role="alert">
+                            {{field.id}} field should related to valid type
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div>
+                <h5>
+                    test generated form
+                </h5>
+                <div> {{dynamicForm.value | json}}</div>
+            </div>
+        </div>
+    </div>
+</div>
